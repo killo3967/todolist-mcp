@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "todolist": {
-      "command": "python",
-      "args": ["F:\\MCP servers\\tdl_mcp_server.py"],
-      "env": {}
-    }
-  }
-}

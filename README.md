@@ -13,7 +13,7 @@ A comprehensive Python MCP server for managing ToDoList (.tdl) XML files. This s
 
 ## Prerequisites
 
-- Python 3.7 or higher
+- Python 3.10 or higher
 - ToDoList application (for .tdl file creation)
 
 ## Installation
@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ## Configuration
 
-By default, the server monitors `D:\Projects\mylist.tdl`. You can change this by modifying the `DEFAULT_TDL_FILE` constant in `tdl_mcp_server.py`.
+Set the `TODOLIST_FILE` environment variable to point to your `.tdl` file. Falls back to the user's default ToDoList path if not set.
 
 ## Usage
 
@@ -68,7 +68,7 @@ Add to your MCP client configuration:
   "mcpServers": {
     "todolist": {
       "command": "python",
-      "args": ["path/to/todolist-mcp/tdl_mcp_server.py"]
+      "args": ["K:/todolist_mcp/tdl_mcp_server.py"]
     }
   }
 }
@@ -130,7 +130,7 @@ todolist-mcp/
 ├── requirements.txt       # Python dependencies
 ├── test_server.py         # Server tests
 ├── test_update_functionality.py  # Update functionality tests
-├── claude_desktop_config.json    # Example MCP configuration
+├── config.json                # Example MCP configuration
 ├── Introduction.tdl       # Sample ToDoList file
 └── README.md             # This file
 ```

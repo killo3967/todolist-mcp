@@ -31,3 +31,6 @@ venv.bak/
 *.log
 # Local Pi runtime state
 .atl/
+
+# Third-party reference source
+docs/ToDoList_9.2/

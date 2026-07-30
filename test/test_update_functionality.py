@@ -4,8 +4,10 @@ Test script for the new update and search functionality
 """
 
 import asyncio
-from tdl_mcp_server import todo_manager, UpdateTaskArgs, SearchTasksArgs
+import pytest
+from src.manager import todo_manager
 
+@pytest.mark.asyncio
 async def test_update_and_search():
     """Test the new update and search features"""
     

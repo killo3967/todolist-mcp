@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "todolist": {
+      "command": "python",
+      "args": ["K:/todolist_mcp/tdl_mcp_server.py"],
+      "env": {
+        "TODOLIST_FILE": "C:/Users/tomas/OneDrive/Documentos/TodoList/Mis proyectos.tdl"
+      }
+    }
+  }
+}

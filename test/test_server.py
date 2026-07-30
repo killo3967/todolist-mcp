@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
-    from tdl_mcp_server import ToDoListManager
+    from src.manager import ToDoListManager
     print("✅ Successfully imported ToDoList MCP Server")
 except ImportError as e:
     print(f"❌ Failed to import server module: {e}")
@@ -23,7 +23,7 @@ def test_file_reading():
     """Test reading the ToDoList file"""
     print("\n🔍 Testing ToDoList file reading...")
     
-    todolist_path = r"D:\Projects\mylist.tdl"
+    todolist_path = r"C:\Users\tomas\OneDrive\Documentos\TodoList\Mis proyectos.tdl"
     
     if not Path(todolist_path).exists():
         print(f"❌ ToDoList file not found: {todolist_path}")
