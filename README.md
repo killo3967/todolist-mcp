@@ -4,6 +4,8 @@
 
 MCP server for managing [ToDoList](https://abstractspoon.com/) `.tdl` files. Tested with **ToDoList 9.2.4**.
 
+![ToDoList](assets/tasktree-view.png)
+
 ## Differences from the original
 
 | Original | This fork |
