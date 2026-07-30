@@ -38,4 +38,5 @@ venv.bak/
 # Local development config
 mcp_server.ini
 config.json
+openspec/
 
