@@ -1,7 +1,7 @@
 """Hot-test infrastructure: black-box MCP contract tests via stdio subprocess.
 
 Each test:
-1. Copies test_hot.tdl to a temp file
+1. Copies test_contract.tdl to a temp file
 2. Sets TODOLIST_FILE env var
 3. Spawns tdl_mcp_server.py as subprocess
 4. Talks JSON-RPC over stdin/stdout
@@ -12,16 +12,14 @@ import json
 import os
 import shutil
 import subprocess
-import sys
-import time
 from pathlib import Path
 
 import pytest
 
-HOT_DIR = Path(__file__).resolve().parent
-PROJECT_DIR = HOT_DIR.parent
+CONTRACT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = CONTRACT_DIR.parent
 SERVER_SCRIPT = PROJECT_DIR / "main.py"
-TEMPLATE_TDL = HOT_DIR / "test_hot.tdl"
+TEMPLATE_TDL = CONTRACT_DIR / "test_contract.tdl"
 VENV_PYTHON = PROJECT_DIR / "venv" / "Scripts" / "python.exe"
 
 
@@ -71,7 +69,7 @@ class MCPClient:
         return self.send("initialize", {
             "protocolVersion": "2024-11-05",
             "capabilities": {},
-            "clientInfo": {"name": "test-hot", "version": "1.0"},
+            "clientInfo": {"name": "test-contract", "version": "1.0"},
         })
 
     def list_tools(self):
@@ -93,9 +91,9 @@ class MCPClient:
 
 @pytest.fixture
 def mcp(tmp_path):
-    """Spawn the MCP server pointed at a fresh copy of test_hot.tdl."""
+    """Spawn the MCP server pointed at a fresh copy of test_contract.tdl."""
     # Copy template .tdl to temp
-    tdl_copy = tmp_path / "test_hot.tdl"
+    tdl_copy = tmp_path / "test_contract.tdl"
     shutil.copy2(TEMPLATE_TDL, tdl_copy)
 
     env = os.environ.copy()

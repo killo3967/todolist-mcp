@@ -4,12 +4,11 @@ Tests use in-memory XML trees — no real .tdl file required.
 """
 
 import xml.etree.ElementTree as ET
-from datetime import date, datetime
+from datetime import date
 
 import pytest
 
 from src.manager import ToDoListManager
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

@@ -52,7 +52,7 @@ For local dev, create `mcp_server.ini`:
 ```ini
 [server]
 active = yes
-tdl_file = test-hot/test_hot.tdl
+tdl_file = test-contract/test_contract.tdl
 ```
 
 ### Tool Reference
@@ -137,4 +137,4 @@ All tools return a string in the `content[0].text` field of the response. For `j
 
 - `references/tool-schemas.json` — full JSON schemas for all 13 tools (generated from server)
 - Server source: `K:/todolist_mcp/tdl_mcp_server.py`
-- Test data: `K:/todolist_mcp/test-hot/test_hot.tdl`
+- Test data: `K:/todolist_mcp/test-contract/test_contract.tdl`

@@ -1,0 +1,9 @@
+# Copy this to mcp_server.ini and adjust for your environment
+# mcp_server.ini is gitignored — never commit your local paths
+
+[server]
+# Set to 'no' to disable this file and use TODOLIST_FILE env var instead
+active = yes
+
+# Path to your .tdl file (relative to project root or absolute)
+tdl_file = test-contract/test_contract.tdl

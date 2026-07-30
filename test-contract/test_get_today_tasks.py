@@ -1,6 +1,5 @@
 """Hot tests for get_today_tasks MCP tool."""
 
-from datetime import date
 
 
 def test_get_today_tasks_defaults_today(mcp):

@@ -58,7 +58,7 @@ def test_move_task_positions_updated(mcp):
     tree = ET.parse(tdl_path)
     all_tasks = tree.getroot().findall(".//TASK")
     pos_strings = [t.get("POSSTRING") for t in all_tasks]
-    assert all(ps for ps in pos_strings), f"Some tasks have empty POSSTRING"
+    assert all(ps for ps in pos_strings), "Some tasks have empty POSSTRING"
 
 
 def test_move_task_nonexistent(mcp):

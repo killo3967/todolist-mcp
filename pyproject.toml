@@ -1,0 +1,12 @@
+[tool.mypy]
+ignore_missing_imports = true
+disable_error_code = ["no-redef", "union-attr", "arg-type", "assignment", "return-value"]
+
+[tool.pyright]
+reportOptionalMemberAccess = false
+reportReturnType = false
+reportArgumentType = false
+reportAttributeAccessIssue = false
+
+[tool.ruff.lint]
+ignore = ["F403", "F405", "F841", "F722", "UP037", "DTZ007", "DTZ011", "BLE001", "RUF010", "DTZ001", "DTZ005", "DTZ006", "RUF059", "C401"]

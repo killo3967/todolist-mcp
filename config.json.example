@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "todolist": {
+      "command": "python",
+      "args": ["path/to/todolist-mcp/main.py"],
+      "env": {
+        "TODOLIST_FILE": "path/to/your-file.tdl"
+      }
+    }
+  }
+}

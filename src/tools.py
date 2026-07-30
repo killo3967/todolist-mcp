@@ -2,13 +2,14 @@
 
 import json
 import xml.etree.ElementTree as ET
-from datetime import datetime, date
+from datetime import date, datetime
 from pathlib import Path
+from typing import Literal
 
 from mcp.server import MCPServer
 
+from src.manager import DEFAULT_TDL_FILE, todo_manager
 from src.models import *
-from src.manager import todo_manager, DEFAULT_TDL_FILE
 
 mcp = MCPServer("todolist-mcp-server", version="0.5.0")
 
@@ -30,7 +31,7 @@ def get_my_tasks(args: GetTasksArgs) -> str:
     except Exception as e:
         return f"Error reading tasks: {str(e)}"
 
-    target_date: Optional[str] = Field(None, description="Target date in YYYY-MM-DD format (defaults to today)")
+    target_date: str | None = Field(None, description="Target date in YYYY-MM-DD format (defaults to today)")
     format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
 
 @mcp.tool()
@@ -64,28 +65,28 @@ def get_today_tasks(args: GetTodayTasksArgs) -> str:
         return f"Error reading tasks: {str(e)}"
 
     title: str = Field(..., description="Task title")
-    position: Optional[str] = Field(None, description="Position to add the task (e.g., '6.3.4' or parent position '5.3.7')")
-    description: Optional[str] = Field(None, description="Task description")
-    due_date: Optional[str] = Field(None, description="Due date in YYYY-MM-DD format")
+    position: str | None = Field(None, description="Position to add the task (e.g., '6.3.4' or parent position '5.3.7')")
+    description: str | None = Field(None, description="Task description")
+    due_date: str | None = Field(None, description="Due date in YYYY-MM-DD format")
     priority: Literal['Low', 'Below Normal', 'Normal', 'Above Normal', 'High', 'Urgent'] = Field("Normal", description="Task priority")
-    category: Optional[str] = Field(None, description="Task category or project")
-    status: Optional[str] = Field(None, description="Task status text (e.g. 'Pendiente', 'In Progress', 'Completed')")
-    time_estimate: Optional[float] = Field(None, description="Time estimate in days (e.g. 0.125 for 3 hours)")
-    color: Optional[str] = Field(None, description="Task color as hex RGB (e.g. '#FF6B35')")
-    start_date: Optional[str] = Field(None, description="Start date in YYYY-MM-DD format")
-    tags: Optional[str] = Field(None, description="Comma-separated tags (e.g. 'bug, urgent, frontend')")
+    category: str | None = Field(None, description="Task category or project")
+    status: str | None = Field(None, description="Task status text (e.g. 'Pendiente', 'In Progress', 'Completed')")
+    time_estimate: float | None = Field(None, description="Time estimate in days (e.g. 0.125 for 3 hours)")
+    color: str | None = Field(None, description="Task color as hex RGB (e.g. '#FF6B35')")
+    start_date: str | None = Field(None, description="Start date in YYYY-MM-DD format")
+    tags: str | None = Field(None, description="Comma-separated tags (e.g. 'bug, urgent, frontend')")
 
     task_id: str = Field(..., description="ID of the task to update")
-    title: Optional[str] = Field(None, description="New task title")
-    description: Optional[str] = Field(None, description="New task description")
-    due_date: Optional[str] = Field(None, description="New due date in YYYY-MM-DD format (empty string to clear)")
-    priority: Optional[Literal['Low', 'Below Normal', 'Normal', 'Above Normal', 'High', 'Urgent']] = Field(None, description="New task priority")
-    category: Optional[str] = Field(None, description="New task category or project (empty string to clear)")
-    percent_done: Optional[int] = Field(None, description="Completion percentage (0-100)", ge=0, le=100)
-    allocated_to: Optional[str] = Field(None, description="Person(s) assigned to task (empty string to clear)")
-    status: Optional[str] = Field(None, description="Task status text (e.g. 'Pendiente', 'In Progress', 'Completed')")
-    time_estimate: Optional[float] = Field(None, description="Time estimate in days (e.g. 0.125 for 3 hours)")
-    color: Optional[str] = Field(None, description="Task color as hex RGB (e.g. '#FF6B35'). Empty string to clear.")
+    title: str | None = Field(None, description="New task title")
+    description: str | None = Field(None, description="New task description")
+    due_date: str | None = Field(None, description="New due date in YYYY-MM-DD format (empty string to clear)")
+    priority: Literal['Low', 'Below Normal', 'Normal', 'Above Normal', 'High', 'Urgent'] | None = Field(None, description="New task priority")
+    category: str | None = Field(None, description="New task category or project (empty string to clear)")
+    percent_done: int | None = Field(None, description="Completion percentage (0-100)", ge=0, le=100)
+    allocated_to: str | None = Field(None, description="Person(s) assigned to task (empty string to clear)")
+    status: str | None = Field(None, description="Task status text (e.g. 'Pendiente', 'In Progress', 'Completed')")
+    time_estimate: float | None = Field(None, description="Time estimate in days (e.g. 0.125 for 3 hours)")
+    color: str | None = Field(None, description="Task color as hex RGB (e.g. '#FF6B35'). Empty string to clear.")
 
     task_id: str = Field(..., description="ID of the task to add a comment to")
     comment: str = Field(..., description="Comment text to append to the task description")
@@ -95,12 +96,12 @@ def get_today_tasks(args: GetTodayTasksArgs) -> str:
 
     format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
 
-    search_term: Optional[str] = Field(None, description="Search in task titles and descriptions")
-    category: Optional[str] = Field(None, description="Filter by category")
-    priority: Optional[Literal['Low', 'Below Normal', 'Normal', 'Above Normal', 'High', 'Urgent']] = Field(None, description="Filter by priority")
-    status: Optional[str] = Field(None, description="Filter by status text (e.g. 'Pendiente', 'En curso', 'Terminado')")
-    completed: Optional[bool] = Field(None, description="Filter by completion status")
-    assigned_to: Optional[str] = Field(None, description="Filter by person assigned")
+    search_term: str | None = Field(None, description="Search in task titles and descriptions")
+    category: str | None = Field(None, description="Filter by category")
+    priority: Literal['Low', 'Below Normal', 'Normal', 'Above Normal', 'High', 'Urgent'] | None = Field(None, description="Filter by priority")
+    status: str | None = Field(None, description="Filter by status text (e.g. 'Pendiente', 'En curso', 'Terminado')")
+    completed: bool | None = Field(None, description="Filter by completion status")
+    assigned_to: str | None = Field(None, description="Filter by person assigned")
     format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
 
     task_id: str = Field(..., description="ID of the task to move")
@@ -156,7 +157,7 @@ def add_task(args: AddTaskArgs) -> str:
         new_task.set('LASTMODSTRING', now.strftime('%d/%m/%Y %I:%M %p'))
         new_task.set('LASTMODBY', 'PI-AGENT')
         if task_data.get('description'):
-            # Usar elemento hijo <COMMENTS>, no el atributo
+            # Use <COMMENTS> child element, not the attribute
             comments_elem = ET.SubElement(new_task, 'COMMENTS')
             comments_elem.text = task_data['description']
         priority_encoded = todo_manager._encode_priority(task_data.get('priority', 'Normal'))
@@ -328,7 +329,7 @@ def get_task(args: GetTaskArgs) -> str:
         if task_elem is None:
             return f"Error: Task with ID '{args.task_id}' not found."
 
-        # Fix: stdlib xml.etree.ElementTree no soporta XPath ".." (parent axis).
+        # stdlib ElementTree does not support XPath ".." (parent axis).
         # Extraemos todas las tareas y buscamos recursivamente para preservar la jerarquía.
         all_tasks = todo_manager.extract_tasks(tree)
 
@@ -469,6 +470,26 @@ def complete_task(args: CompleteTaskArgs) -> str:
         return message
     except Exception as e:
         return f"Error completing task: {str(e)}"
+
+@mcp.tool()
+def delete_task(args: DeleteTaskArgs) -> str:
+    if not Path(DEFAULT_TDL_FILE).exists():
+        return f"Error: ToDoList file doesn't exist: {DEFAULT_TDL_FILE}."
+    try:
+        tree = todo_manager.parse_tdl_file()
+        root = tree.getroot()
+        task = todo_manager._find_task_element(root, args.task_id)
+        if task is None:
+            return f"Error: Task with ID '{args.task_id}' not found."
+        parent = todo_manager._find_parent(root, args.task_id)
+        if parent is None:
+            parent = root
+        parent.remove(task)
+        todo_manager._update_positions(parent)
+        todo_manager._save_tdl_file(tree, DEFAULT_TDL_FILE)
+        return f"Successfully deleted task '{args.task_id}'."
+    except Exception as e:
+        return f"Error deleting task: {str(e)}"
 
 
 @mcp.tool()

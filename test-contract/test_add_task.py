@@ -2,7 +2,6 @@
 
 import xml.etree.ElementTree as ET
 
-
 # ── title (only required field) ──
 
 def test_add_task_minimal(mcp):

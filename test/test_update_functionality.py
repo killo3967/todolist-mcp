@@ -4,8 +4,11 @@ Test script for the new update and search functionality
 """
 
 import asyncio
+
 import pytest
+
 from src.manager import todo_manager
+
 
 @pytest.mark.asyncio
 async def test_update_and_search():

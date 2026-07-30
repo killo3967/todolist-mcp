@@ -6,7 +6,7 @@ def test_analyze_structure(mcp):
     result = client.call_tool("analyze_structure", {})
     text = result["result"]["content"][0]["text"]
     assert "Root Element: TODOLIST" in text
-    assert "Project Name: test-hot" in text
+    assert "Project Name: test-contract" in text
     assert "Next Unique ID:" in text
     assert "Tasks:" in text
     assert "Categories:" in text

@@ -1,12 +1,11 @@
 """ToDoList XML file manager."""
 
-import json
 import os
-from configparser import ConfigParser
-from datetime import datetime, date, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
 import xml.etree.ElementTree as ET
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from typing import Any
+
 
 def _resolve_tdl_file() -> str:
     env_value = os.environ.get('TODOLIST_FILE')
@@ -21,18 +20,19 @@ def _resolve_tdl_file() -> str:
             ini_value = cfg.get('server', 'tdl_file', fallback='')
             if ini_value:
                 return ini_value
-    return os.environ.get('TODOLIST_FILE', r'C:\\Users\\tomas\\OneDrive\\Documentos\\TodoList\\Mis proyectos.tdl')
+    # No env var, no INI — use a sensible default
+    return os.path.expanduser("~/todolist.tdl")
 
 DEFAULT_TDL_FILE = _resolve_tdl_file()
 
 class ToDoListManager:
     """Manages ToDoList application XML-based .tdl files"""
     
-    def __init__(self, base_path: str = None, default_file: str = DEFAULT_TDL_FILE):
+    def __init__(self, base_path: str | None = None, default_file: str = DEFAULT_TDL_FILE):
         self.base_path = Path(base_path) if base_path else Path.cwd()
         self.default_file = default_file
     
-    def parse_tdl_file(self, file_path: str = None) -> ET.ElementTree:
+    def parse_tdl_file(self, file_path: str | None = None) -> ET.ElementTree:
         """Parse a .tdl XML file"""
         if file_path is None:
             file_path = self.default_file
@@ -45,12 +45,12 @@ class ToDoListManager:
         except FileNotFoundError:
             raise FileNotFoundError(f"File not found: {file_path}")
     
-    def extract_tasks(self, tree: ET.ElementTree) -> List[Dict[str, Any]]:
+    def extract_tasks(self, tree: ET.ElementTree) -> list[dict[str, Any]]:
         """Extract tasks from ToDoList XML format in a hierarchical structure"""
         root = tree.getroot()
         return self._extract_tasks_recursive(root)
 
-    def _extract_tasks_recursive(self, parent_element: ET.Element) -> List[Dict[str, Any]]:
+    def _extract_tasks_recursive(self, parent_element: ET.Element) -> list[dict[str, Any]]:
         """Recursively extract tasks from a parent element."""
         tasks = []
         for task_elem in parent_element.findall('./TASK'):
@@ -203,7 +203,7 @@ class ToDoListManager:
         bgr = hex_color[4:6] + hex_color[2:4] + hex_color[0:2]
         return str(int(bgr, 16))
     
-    def _find_task_by_pos_string(self, root: ET.Element, pos_string: str) -> Optional[ET.Element]:
+    def _find_task_by_pos_string(self, root: ET.Element, pos_string: str) -> ET.Element | None:
         """Find a task element by its POSSTRING."""
         if not pos_string:
             return root
@@ -275,7 +275,7 @@ class ToDoListManager:
         # Write with XML declaration
         tree.write(file_path, encoding='utf-8', xml_declaration=True)
     
-    def update_task(self, task_id: str, file_path: str = None, **updates) -> Tuple[bool, str]:
+    def update_task(self, task_id: str, file_path: str | None = None, **updates) -> tuple[bool, str]:
         """Update an existing task in ToDoList format"""
         if file_path is None:
             file_path = self.default_file
@@ -306,12 +306,12 @@ class ToDoListManager:
                 updated_fields.append('title')
             
             if 'description' in updates and updates['description'] is not None and updates['description'] != '':
-                # Usar elemento hijo <COMMENTS>, no el atributo
+                # Use <COMMENTS> child element, not the attribute
                 comments_elem = task_elem.find('COMMENTS')
                 if comments_elem is None:
                     comments_elem = ET.SubElement(task_elem, 'COMMENTS')
                 comments_elem.text = updates['description']
-                # Eliminar COMMENTSTYPE para que ToDoList muestre texto plano
+                # Remove COMMENTSTYPE so ToDoList displays plain text
                 if 'COMMENTSTYPE' in task_elem.attrib:
                     del task_elem.attrib['COMMENTSTYPE']
                 if 'COMMENTS' in task_elem.attrib:
@@ -449,7 +449,7 @@ class ToDoListManager:
         except Exception as e:
             return False, f"Error updating task: {str(e)}"
 
-    def add_comment(self, task_id: str, comment: str, file_path: str = None) -> tuple:
+    def add_comment(self, task_id: str, comment: str, file_path: str | None = None) -> tuple:
         """Append a comment to a task description. Never replaces — always appends."""
         if file_path is None:
             file_path = self.default_file
@@ -458,17 +458,17 @@ class ToDoListManager:
             root = tree.getroot()
             for task in root.findall('.//TASK'):
                 if task.get('ID') == task_id:
-                    # Usar elemento hijo <COMMENTS>, no el atributo
+                    # Use <COMMENTS> child element, not the attribute
                     comments_elem = task.find('COMMENTS')
                     current = comments_elem.text if comments_elem is not None and comments_elem.text else ''
-                    # Fallback al atributo si el elemento hijo no existe
+                    # Fallback to attribute if child element does not exist
                     if not current:
                         current = task.get('COMMENTS', '')
                     new_comment = comment if not current else current + '\n' + comment
                     if comments_elem is None:
                         comments_elem = ET.SubElement(task, 'COMMENTS')
                     comments_elem.text = new_comment
-                    # Eliminar COMMENTSTYPE para que ToDoList muestre texto plano
+                    # Remove COMMENTSTYPE so ToDoList displays plain text
                     if 'COMMENTSTYPE' in task.attrib:
                         del task.attrib['COMMENTSTYPE']
                     if 'COMMENTS' in task.attrib:
@@ -513,7 +513,7 @@ class ToDoListManager:
             'by_category': by_category,
         }
 
-    def filter_tasks_by_date(self, tasks: List[Dict], target_date: date = None) -> List[Dict]:
+    def filter_tasks_by_date(self, tasks: list[dict], target_date: date | None = None) -> list[dict]:
         """Filter tasks by due date (defaults to today)"""
         if target_date is None:
             target_date = date.today()
@@ -534,7 +534,7 @@ class ToDoListManager:
         
         return today_tasks
     
-    def search_tasks(self, tasks: List[Dict], **filters) -> List[Dict]:
+    def search_tasks(self, tasks: list[dict], **filters) -> list[dict]:
         """Search and filter tasks based on various criteria"""
         filtered_tasks = tasks.copy()
         
@@ -589,7 +589,7 @@ class ToDoListManager:
             ]
         return filtered_tasks
     
-    def format_tasks_as_markdown(self, tasks: List[Dict]) -> str:
+    def format_tasks_as_markdown(self, tasks: list[dict]) -> str:
         """Convert tasks to Markdown format, preserving hierarchy."""
         if not tasks:
             return "No tasks found."
@@ -598,7 +598,7 @@ class ToDoListManager:
         self._format_tasks_recursive(tasks, md_lines, level=0)
         return "\n".join(md_lines)
 
-    def _format_tasks_recursive(self, tasks: List[Dict], md_lines: List[str], level: int):
+    def _format_tasks_recursive(self, tasks: list[dict], md_lines: list[str], level: int):
         """Recursively format tasks with indentation."""
         indent = "  " * level
         

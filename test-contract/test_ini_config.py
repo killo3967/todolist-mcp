@@ -1,12 +1,11 @@
 """Hot tests for mcp_server.ini configuration override."""
 
-import xml.etree.ElementTree as ET
 
 
 def test_ini_override_works(mcp):
     """When mcp_server.ini exists, it overrides TODOLIST_FILE env var.
 
-    The hot-test fixture sets TODOLIST_FILE to a temp copy of test_hot.tdl.
+    The hot-test fixture sets TODOLIST_FILE to a temp copy of test_contract.tdl.
     We create a DIFFERENT .tdl and point mcp_server.ini to it.
     The server should use the INI file, not the env var.
     """
@@ -16,7 +15,7 @@ def test_ini_override_works(mcp):
     result = client.call_tool("get_file_status", {})
     status_text = result["result"]["content"][0]["text"]
     # Server reports the file it's monitoring
-    assert "test-hot" in status_text  # Our test data has PROJECTNAME="test-hot"
+    assert "test-contract" in status_text  # Our test data has PROJECTNAME="test-contract"
 
     # Can't easily test INI in hot-tests because the server script is
     # in the project dir, not the temp dir. The __file__ resolution

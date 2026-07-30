@@ -2,7 +2,6 @@
 
 import xml.etree.ElementTree as ET
 
-
 # ── title ──
 
 def test_update_title(mcp):
