@@ -11,7 +11,7 @@ from mcp.server import MCPServer
 from src.manager import DEFAULT_TDL_FILE, todo_manager
 from src.models import *
 
-mcp = MCPServer("todolist-mcp-server", version="0.5.0")
+mcp = MCPServer("todolist-mcp-server", version="1.0.0")
 
 @mcp.tool()
 def get_my_tasks(args: GetTasksArgs) -> str:
