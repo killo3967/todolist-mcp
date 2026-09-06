@@ -26,6 +26,7 @@ class AddTaskArgs(BaseModel):
     color: str | None = Field(None, description="Task color as hex RGB (e.g. '#FF6B35')")
     start_date: str | None = Field(None, description="Start date in YYYY-MM-DD format")
     tags: str | None = Field(None, description="Comma-separated tags (e.g. 'bug, urgent, frontend')")
+    icon: int | None = Field(None, description="Task icon index (ToDoList ICONINDEX, e.g. 85 for the standard project/folder icon)")
 
 
 class UpdateTaskArgs(BaseModel):
@@ -42,6 +43,7 @@ class UpdateTaskArgs(BaseModel):
     color: str | None = Field(None, description="Task color as hex RGB (e.g. '#FF6B35'). Empty string to clear.")
     start_date: str | None = Field(None, description="Start date in YYYY-MM-DD format (empty string to clear)")
     tags: str | None = Field(None, description="Comma-separated tags (empty string to clear)")
+    icon: int | None = Field(None, description="New task icon index (ToDoList ICONINDEX, e.g. 85). Set to 0 to clear.")
 
 
 class AddCommentArgs(BaseModel):

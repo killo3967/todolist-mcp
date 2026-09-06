@@ -304,6 +304,9 @@ class ToDoListManager:
             if 'title' in updates and updates['title'] is not None:
                 task_elem.set('TITLE', updates['title'])
                 updated_fields.append('title')
+            if 'icon' in updates and updates['icon'] is not None:
+                task_elem.set('ICONINDEX', str(updates['icon']))
+                updated_fields.append('icon')
             
             if 'description' in updates and updates['description'] is not None and updates['description'] != '':
                 # Use <COMMENTS> child element, not the attribute

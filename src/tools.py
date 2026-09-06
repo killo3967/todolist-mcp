@@ -128,6 +128,8 @@ def add_task(args: AddTaskArgs) -> str:
             new_task.set('TIMEESTIMATE', str(task_data['time_estimate']))
         if task_data.get('color'):
             new_task.set('COLOR', todo_manager._hex_to_rgb_int(task_data['color']))
+        if task_data.get('icon') is not None:
+            new_task.set('ICONINDEX', str(task_data['icon']))
         if task_data.get('start_date'):
             sd = todo_manager._encode_date(task_data['start_date'])
             if sd:
