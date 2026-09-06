@@ -15,12 +15,12 @@ class _TaskIdArgs(BaseModel):
 
 
 class GetTasksArgs(BaseModel):
-    format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
+    format: Literal['markdown', 'json'] = Field("json", description="Output format")
 
 
 class GetTodayTasksArgs(BaseModel):
     target_date: str | None = Field(None, description="Target date in YYYY-MM-DD format (defaults to today)")
-    format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
+    format: Literal['markdown', 'json'] = Field("json", description="Output format")
 
 
 class AddTaskArgs(BaseModel):
@@ -66,7 +66,7 @@ class CompleteTaskArgs(_TaskIdArgs):
 
 
 class GetTaskStatsArgs(BaseModel):
-    format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
+    format: Literal['markdown', 'json'] = Field("json", description="Output format")
 
 
 class SearchTasksArgs(BaseModel):
@@ -76,7 +76,7 @@ class SearchTasksArgs(BaseModel):
     status: str | None = Field(None, description="Filter by status text (e.g. 'Pendiente', 'En curso', 'Terminado')")
     completed: bool | None = Field(None, description="Filter by completion status")
     assigned_to: str | None = Field(None, description="Filter by person assigned")
-    format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
+    format: Literal['markdown', 'json'] = Field("json", description="Output format")
 
 
 class MoveTaskArgs(_TaskIdArgs):
@@ -86,7 +86,7 @@ class MoveTaskArgs(_TaskIdArgs):
 
 class GetTaskArgs(_TaskIdArgs):
     task_id: str = Field(..., description="ID of the task to retrieve")
-    format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
+    format: Literal['markdown', 'json'] = Field("json", description="Output format")
 
 class DeleteTaskArgs(_TaskIdArgs):
     task_id: str = Field(..., description="ID of the task to delete")
@@ -94,4 +94,4 @@ class DeleteTaskArgs(_TaskIdArgs):
 
 class ReadAnyTdlArgs(BaseModel):
     file_path: str = Field(..., description="Path to the .tdl file")
-    format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
+    format: Literal['markdown', 'json'] = Field("json", description="Output format")

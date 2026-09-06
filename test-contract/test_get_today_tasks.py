@@ -3,14 +3,12 @@
 
 
 def test_get_today_tasks_defaults_today(mcp):
-    """Without target_date, returns tasks due today (should be empty in test data)."""
+    """Sin target_date devuelve JSON (lista, posiblemente vacia)."""
     client, _ = mcp
     result = client.call_tool("get_today_tasks", {})
-    text = result["result"]["content"][0]["text"]
-    # Task Delta has due_date 2026-01-01 — not today, so no tasks unless today is 2026-01-01
-    if "No tasks" not in text:
-        # If today is 2026-01-01, Delta should appear
-        assert "Task Delta" in text
+    import json
+    data = json.loads(result["result"]["content"][0]["text"])
+    assert isinstance(data, list)
 
 
 def test_get_today_tasks_specific_date_match(mcp):
@@ -22,11 +20,12 @@ def test_get_today_tasks_specific_date_match(mcp):
 
 
 def test_get_today_tasks_specific_date_no_match(mcp):
-    """2020-01-01 has no tasks due."""
+    """2020-01-01 no tiene tareas: lista JSON vacia."""
     client, _ = mcp
     result = client.call_tool("get_today_tasks", {"target_date": "2020-01-01"})
-    text = result["result"]["content"][0]["text"]
-    assert "No tasks due" in text
+    import json
+    data = json.loads(result["result"]["content"][0]["text"])
+    assert data == []
 
 
 def test_get_today_tasks_invalid_date(mcp):

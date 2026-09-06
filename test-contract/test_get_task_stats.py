@@ -2,8 +2,9 @@
 
 
 def test_get_task_stats(mcp):
+    """Formato markdown explicito (el default ahora es json)."""
     client, _ = mcp
-    result = client.call_tool("get_task_stats", {})
+    result = client.call_tool("get_task_stats", {"format": "markdown"})
     text = result["result"]["content"][0]["text"]
     assert "Task Statistics" in text
     assert "By Status" in text
