@@ -113,9 +113,8 @@ def add_task(args: AddTaskArgs) -> str:
         new_task.set('LASTMODSTRING', now.strftime('%d/%m/%Y %I:%M %p'))
         new_task.set('LASTMODBY', 'PI-AGENT')
         if task_data.get('description'):
-            # Use <COMMENTS> child element, not the attribute
-            comments_elem = ET.SubElement(new_task, 'COMMENTS')
-            comments_elem.text = task_data['description']
+            # COMMENTS (plano) + CUSTOMCOMMENTS (lo que muestra ToDoList)
+            todo_manager._write_comments(new_task, task_data['description'])
         priority_encoded = todo_manager._encode_priority(task_data.get('priority', 'Normal'))
         new_task.set('PRIORITY', priority_encoded)
         if task_data.get('due_date'):
