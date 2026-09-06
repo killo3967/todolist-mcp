@@ -1,6 +1,7 @@
 """ToDoList XML file manager."""
 
 import os
+import base64
 import xml.etree.ElementTree as ET
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -288,6 +289,18 @@ class ToDoListManager:
         # Write with XML declaration
         tree.write(file_path, encoding='utf-8', xml_declaration=True)
     
+    def _write_comments(self, task_elem: ET.Element, text: str):
+        """Escribir comments en COMMENTS (plano) y CUSTOMCOMMENTS (base64 UTF-16LE, lo que muestra ToDoList)."""
+        text = text.replace('\x00', '')
+        ce = task_elem.find('COMMENTS')
+        if ce is None:
+            ce = ET.SubElement(task_elem, 'COMMENTS')
+        ce.text = text
+        cc = task_elem.find('CUSTOMCOMMENTS')
+        if cc is None:
+            cc = ET.SubElement(task_elem, 'CUSTOMCOMMENTS')
+        cc.text = base64.b64encode(text.encode('utf-16-le')).decode('ascii')
+    
     def update_task(self, task_id: str, file_path: str | None = None, **updates) -> tuple[bool, str]:
         """Update an existing task in ToDoList format"""
         if file_path is None:
@@ -322,11 +335,8 @@ class ToDoListManager:
                 updated_fields.append('icon')
             
             if 'description' in updates and updates['description'] is not None and updates['description'] != '':
-                # Use <COMMENTS> child element, not the attribute
-                comments_elem = task_elem.find('COMMENTS')
-                if comments_elem is None:
-                    comments_elem = ET.SubElement(task_elem, 'COMMENTS')
-                comments_elem.text = updates['description']
+                # Escribir en COMMENTS (plano) y CUSTOMCOMMENTS (lo que muestra ToDoList)
+                self._write_comments(task_elem, updates['description'])
                 # Remove COMMENTSTYPE so ToDoList displays plain text
                 if 'COMMENTSTYPE' in task_elem.attrib:
                     del task_elem.attrib['COMMENTSTYPE']
@@ -474,16 +484,13 @@ class ToDoListManager:
             root = tree.getroot()
             for task in root.findall('.//TASK'):
                 if task.get('ID') == task_id:
-                    # Use <COMMENTS> child element, not the attribute
+                    # Leer comments actuales (COMMENTS plano) y anadir al final
                     comments_elem = task.find('COMMENTS')
                     current = comments_elem.text if comments_elem is not None and comments_elem.text else ''
-                    # Fallback to attribute if child element does not exist
                     if not current:
                         current = task.get('COMMENTS', '')
                     new_comment = comment if not current else current + '\n' + comment
-                    if comments_elem is None:
-                        comments_elem = ET.SubElement(task, 'COMMENTS')
-                    comments_elem.text = new_comment
+                    self._write_comments(task, new_comment)
                     # Remove COMMENTSTYPE so ToDoList displays plain text
                     if 'COMMENTSTYPE' in task.attrib:
                         del task.attrib['COMMENTSTYPE']
