@@ -551,8 +551,8 @@ class TestUpdateTask:
         comments = task.find("COMMENTS")
         assert comments is not None
         assert comments.text == "New desc"
-        # Should NOT have COMMENTSTYPE (forces RTF)
-        assert "COMMENTSTYPE" not in task.attrib
+        # COMMENTSTYPE debe apuntar al plugin de texto plano (no RTF)
+        assert task.get("COMMENTSTYPE") == "BAA4E079-268B-4B9B-B7C8-6D15CCF058A2"
 
     def test_update_due_date(self, manager, tmp_tdl):
         success, msg = manager.update_task("1", due_date="2025-12-25", file_path=tmp_tdl)

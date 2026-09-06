@@ -29,7 +29,7 @@ def test_update_description(mcp):
     comments = task.find("COMMENTS")
     assert comments is not None
     assert comments.text == "Updated desc"
-    assert "COMMENTSTYPE" not in task.attrib
+    assert task.get("COMMENTSTYPE") == "BAA4E079-268B-4B9B-B7C8-6D15CCF058A2"
 
 
 # ── due_date (set + clear) ──

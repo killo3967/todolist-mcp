@@ -290,7 +290,11 @@ class ToDoListManager:
         tree.write(file_path, encoding='utf-8', xml_declaration=True)
     
     def _write_comments(self, task_elem: ET.Element, text: str):
-        """Escribir comments en COMMENTS (plano) y CUSTOMCOMMENTS (base64 UTF-16LE, lo que muestra ToDoList)."""
+        """Escribir comments en COMMENTS (plano) y CUSTOMCOMMENTS (base64 UTF-16LE, lo que muestra ToDoList).
+
+        Ademas fija COMMENTSTYPE al GUID del plugin de texto plano para que ToDoList
+        no interprete el contenido como RTF (issue #1 / tarea 179).
+        """
         text = text.replace('\x00', '')
         ce = task_elem.find('COMMENTS')
         if ce is None:
@@ -300,6 +304,8 @@ class ToDoListManager:
         if cc is None:
             cc = ET.SubElement(task_elem, 'CUSTOMCOMMENTS')
         cc.text = base64.b64encode(text.encode('utf-16-le')).decode('ascii')
+        # Plugin de texto plano (no RTF)
+        task_elem.set('COMMENTSTYPE', 'BAA4E079-268B-4B9B-B7C8-6D15CCF058A2')
     
     def update_task(self, task_id: str, file_path: str | None = None, **updates) -> tuple[bool, str]:
         """Update an existing task in ToDoList format"""
@@ -337,9 +343,6 @@ class ToDoListManager:
             if 'description' in updates and updates['description'] is not None and updates['description'] != '':
                 # Escribir en COMMENTS (plano) y CUSTOMCOMMENTS (lo que muestra ToDoList)
                 self._write_comments(task_elem, updates['description'])
-                # Remove COMMENTSTYPE so ToDoList displays plain text
-                if 'COMMENTSTYPE' in task_elem.attrib:
-                    del task_elem.attrib['COMMENTSTYPE']
                 if 'COMMENTS' in task_elem.attrib:
                     del task_elem.attrib['COMMENTS']
                 updated_fields.append('description')
@@ -491,9 +494,6 @@ class ToDoListManager:
                         current = task.get('COMMENTS', '')
                     new_comment = comment if not current else current + '\n' + comment
                     self._write_comments(task, new_comment)
-                    # Remove COMMENTSTYPE so ToDoList displays plain text
-                    if 'COMMENTSTYPE' in task.attrib:
-                        del task.attrib['COMMENTSTYPE']
                     if 'COMMENTS' in task.attrib:
                         del task.attrib['COMMENTS']
                     # Update modification timestamp (Excel serial, igual que update_task)

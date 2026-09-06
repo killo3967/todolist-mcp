@@ -27,8 +27,8 @@ def test_add_comment_first_time(mcp):
     assert comments is not None, "COMMENTS element should be created"
     assert "First hot-test comment" in (comments.text or "")
 
-    # COMMENTSTYPE must NOT be present (forces RTF)
-    assert "COMMENTSTYPE" not in task.attrib
+    # COMMENTSTYPE debe apuntar al plugin de texto plano (no RTF)
+    assert task.get("COMMENTSTYPE") == "BAA4E079-268B-4B9B-B7C8-6D15CCF058A2"
 
 
 def test_add_comment_appends(mcp):
