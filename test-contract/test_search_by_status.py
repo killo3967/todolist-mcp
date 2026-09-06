@@ -16,16 +16,16 @@ def test_search_by_status_completed(mcp):
 
 
 def test_search_status_combined(mcp):
-    """Above Normal + En curso should find Subtask Alpha-2.
-    Note: search_tasks only matches top-level tasks, not children."""
+    """Above Normal + En curso debe encontrar Subtask Alpha-2 (tarea anidada)."""
     client, _ = mcp
     result = client.call_tool("search_tasks", {
         "status": "En curso",
         "priority": "Above Normal",
     })
     text = result["result"]["content"][0]["text"]
-    # Subtask Alpha-2 is a child of Task Alpha, not top-level
-    assert "No tasks found" in text
+    # Subtask Alpha-2 es hija de Task Alpha; la busqueda debe recorrer el arbol.
+    assert "Subtask Alpha-2" in text
+    assert "No tasks found" not in text
 
 
 def test_search_status_no_match(mcp):

@@ -108,3 +108,12 @@ def test_search_all_filters_no_match(mcp):
     text = result["result"]["content"][0]["text"]
     # Gamma is Low but completed, Beta is Normal and incomplete — no match
     assert "No tasks found" in text
+
+
+def test_search_nested_subtask_by_title(mcp):
+    """Buscar por titulo debe encontrar tareas anidadas, no solo raiz."""
+    client, _ = mcp
+    result = client.call_tool("search_tasks", {"search_term": "Subtask Alpha-1"})
+    text = result["result"]["content"][0]["text"]
+    assert "Subtask Alpha-1" in text
+    assert "Task Alpha" not in text

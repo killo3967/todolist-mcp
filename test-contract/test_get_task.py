@@ -68,3 +68,11 @@ def test_get_task_child(mcp):
     data = json.loads(result["result"]["content"][0]["text"])
     assert data[0]["id"] == "2"
     assert data[0]["title"] == "Subtask Alpha-1"
+
+
+def test_get_task_int_id(mcp):
+    """task_id entero debe coercionarse a string automaticamente."""
+    client, _ = mcp
+    result = client.call_tool("get_task", {"task_id": 1})
+    text = result["result"]["content"][0]["text"]
+    assert "Task Alpha" in text

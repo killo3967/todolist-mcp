@@ -332,8 +332,9 @@ def get_file_status() -> str:
         file_version = root.get('FILEVERSION', 'Unknown')
         app_version = root.get('APPVER', 'Unknown')
         
-        task_count = len(tasks)
-        completed = len([t for t in tasks if t.get('completed', False)])
+        stats = todo_manager.get_stats(tasks)
+        task_count = stats['total']
+        completed = stats['completed']
         
         return f"""ToDoList File Status
 File: {DEFAULT_TDL_FILE}

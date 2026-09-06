@@ -240,6 +240,19 @@ class ToDoListManager:
                     return found
         return None
 
+    def _flatten_tasks(self, tasks: list) -> list:
+        """Aplanar la estructura jerarquica de extract_tasks a una lista plana.
+
+        Se elimina la clave 'children' de cada tarea para que las funciones de
+        busqueda/filtrado no dupliquen subarboles al formatear el resultado.
+        """
+        flat: list = []
+        for task in tasks:
+            flat.append({k: v for k, v in task.items() if k != 'children'})
+            if task.get('children'):
+                flat.extend(self._flatten_tasks(task['children']))
+        return flat
+
     def _update_positions(self, parent_element: ET.Element):
         """Update the POS and POSSTRING of all child tasks of a given element."""
         parent_pos_string = parent_element.get('POSSTRING', '')
@@ -476,10 +489,10 @@ class ToDoListManager:
                         del task.attrib['COMMENTSTYPE']
                     if 'COMMENTS' in task.attrib:
                         del task.attrib['COMMENTS']
-                    # Update modification timestamp
+                    # Update modification timestamp (Excel serial, igual que update_task)
                     from datetime import datetime
                     now = datetime.now()
-                    root.set('LASTMOD', now.strftime('%Y%m%d') + '.' + now.strftime('%H%M%S'))
+                    root.set('LASTMOD', self._encode_date(now.strftime('%Y-%m-%d')))
                     root.set('LASTMODSTRING', now.strftime('%d/%m/%Y %I:%M %p'))
                     self._save_tdl_file(tree, file_path)
                     return True, f"Comment added to task '{task_id}'"
@@ -518,6 +531,7 @@ class ToDoListManager:
 
     def filter_tasks_by_date(self, tasks: list[dict], target_date: date | None = None) -> list[dict]:
         """Filter tasks by due date (defaults to today)"""
+        tasks = self._flatten_tasks(tasks)
         if target_date is None:
             target_date = date.today()
         
@@ -539,7 +553,7 @@ class ToDoListManager:
     
     def search_tasks(self, tasks: list[dict], **filters) -> list[dict]:
         """Search and filter tasks based on various criteria"""
-        filtered_tasks = tasks.copy()
+        filtered_tasks = self._flatten_tasks(tasks)
         
         # Filter by search term (title and description)
         if filters.get('search_term'):

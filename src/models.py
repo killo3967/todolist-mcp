@@ -2,7 +2,16 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class _TaskIdArgs(BaseModel):
+    """Base para modelos que referencian tareas por ID.
+
+    coerce_numbers_to_str permite que task_id se envie como entero (p. ej. 246)
+    y se normalice a string automaticamente, evitando errores de validacion.
+    """
+    model_config = ConfigDict(coerce_numbers_to_str=True)
 
 
 class GetTasksArgs(BaseModel):
@@ -29,7 +38,7 @@ class AddTaskArgs(BaseModel):
     icon: int | None = Field(None, description="Task icon index (ToDoList ICONINDEX, e.g. 85 for the standard project/folder icon)")
 
 
-class UpdateTaskArgs(BaseModel):
+class UpdateTaskArgs(_TaskIdArgs):
     task_id: str = Field(..., description="ID of the task to update")
     title: str | None = Field(None, description="New task title")
     description: str | None = Field(None, description="New task description")
@@ -46,12 +55,12 @@ class UpdateTaskArgs(BaseModel):
     icon: int | None = Field(None, description="New task icon index (ToDoList ICONINDEX, e.g. 85). Set to 0 to clear.")
 
 
-class AddCommentArgs(BaseModel):
+class AddCommentArgs(_TaskIdArgs):
     task_id: str = Field(..., description="ID of the task to add a comment to")
     comment: str = Field(..., description="Comment text to append to the task description")
 
 
-class CompleteTaskArgs(BaseModel):
+class CompleteTaskArgs(_TaskIdArgs):
     task_id: str = Field(..., description="ID of the task to complete")
     status_text: str = Field("Completed", description="Status text to set (e.g. 'Terminado', 'Completed')")
 
@@ -70,16 +79,16 @@ class SearchTasksArgs(BaseModel):
     format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
 
 
-class MoveTaskArgs(BaseModel):
+class MoveTaskArgs(_TaskIdArgs):
     task_id: str = Field(..., description="ID of the task to move")
     new_position: str = Field(..., description="New position for the task (e.g., '6.3.4' or parent position '5.3.7')")
 
 
-class GetTaskArgs(BaseModel):
+class GetTaskArgs(_TaskIdArgs):
     task_id: str = Field(..., description="ID of the task to retrieve")
     format: Literal['markdown', 'json'] = Field("markdown", description="Output format")
 
-class DeleteTaskArgs(BaseModel):
+class DeleteTaskArgs(_TaskIdArgs):
     task_id: str = Field(..., description="ID of the task to delete")
 
 
