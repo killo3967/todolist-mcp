@@ -6,12 +6,17 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Literal
 
-from mcp.server import MCPServer
+try:
+    from mcp.server import MCPServer as Server
+    mcp = Server("todolist-mcp-server", version="1.0.0")
+except ImportError:  # mcp 1.x: MCPServer no existe, se usa FastMCP
+    from mcp.server import FastMCP as Server
+    mcp = Server("todolist-mcp-server")
 
 from src.manager import DEFAULT_TDL_FILE, todo_manager
 from src.models import *
 
-mcp = MCPServer("todolist-mcp-server", version="1.0.0")
+
 
 @mcp.tool()
 def get_my_tasks(args: GetTasksArgs) -> str:
