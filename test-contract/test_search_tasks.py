@@ -117,3 +117,12 @@ def test_search_nested_subtask_by_title(mcp):
     text = result["result"]["content"][0]["text"]
     assert "Subtask Alpha-1" in text
     assert "Task Alpha" not in text
+
+
+def test_search_by_allocated_to(mcp):
+    """Filter by assigned person (ALLOCATEDTO)."""
+    client, _ = mcp
+    result = client.call_tool("search_tasks", {"allocated_to": "Alice"})
+    text = result["result"]["content"][0]["text"]
+    assert "Task Alpha" in text
+    assert "Task Beta" not in text

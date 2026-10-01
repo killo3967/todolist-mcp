@@ -78,7 +78,7 @@ class MCPClient:
     def call_tool(self, name, arguments):
         return self.send("tools/call", {
             "name": name,
-            "arguments": {"args": arguments},
+            "arguments": arguments,
         })
 
     def close(self):

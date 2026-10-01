@@ -4,11 +4,14 @@ These require a real .tdl file configured via TODOLIST_FILE env var
 or the default path. They run only when the file exists.
 """
 
+import xml.etree.ElementTree as ET
+from datetime import date
 from pathlib import Path
 
 import pytest
 
-from src.manager import ToDoListManager
+from src.domain.models import Priority
+from src.infrastructure.repository import XmlTodoRepository
 
 
 @pytest.fixture
@@ -23,39 +26,28 @@ def tdl_path():
 
 def test_file_reading(tdl_path):
     """The .tdl file can be parsed as valid XML."""
-    manager = ToDoListManager()
-    tree = manager.parse_tdl_file(tdl_path)
-    root = tree.getroot()
+    root = ET.parse(tdl_path).getroot()
     assert root.tag == "TODOLIST"
     assert root.get("PROJECTNAME")
 
 
 def test_task_extraction(tdl_path):
-    """Tasks can be extracted from the .tdl file."""
-    manager = ToDoListManager()
-    tree = manager.parse_tdl_file(tdl_path)
-    tasks = manager.extract_tasks(tree)
+    """Tasks can be loaded from the .tdl file."""
+    tasks, _, _ = XmlTodoRepository(tdl_path).load_all()
     assert len(tasks) > 0
 
 
 def test_date_handling():
     """Date encode/decode round-trips correctly."""
-    manager = ToDoListManager()
-    test_date = "2025-09-08"
-    encoded = manager._encode_date(test_date)
+    repo = XmlTodoRepository("nonexistent.tdl")
+    target = date(2025, 9, 8)
+    encoded = repo._encode_date(target)
     assert encoded, "Date encoding returned empty"
-    decoded = manager._decode_date(encoded)
-    assert decoded == test_date, f"Roundtrip failed: {test_date} != {decoded}"
+    assert repo._decode_date(encoded) == target
 
 
 def test_priority_handling():
-    """All priority levels encode and decode correctly."""
-    manager = ToDoListManager()
-    priorities = ["Low", "Normal", "High", "Urgent"]
-    for priority in priorities:
-        encoded = manager._encode_priority(priority)
-        decoded = manager._decode_priority(encoded)
-        # Note: Urgent encodes to 3, but _decode_priority maps >=2 to High
-    # so Urgent round-trips to High — this is expected ToDoList behavior
-    assert decoded == ("High" if priority == "Urgent" else priority), \
-        f"Priority roundtrip failed: {priority} -> {encoded} -> {decoded}"
+    """All priority levels round-trip through code and back."""
+    for label in ["Low", "Normal", "High", "Urgent"]:
+        p = Priority.from_str(label)
+        assert Priority.from_str(p.to_str()) is p
