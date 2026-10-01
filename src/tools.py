@@ -14,7 +14,6 @@ except ImportError:  # mcp 1.x: MCPServer no existe, se usa FastMCP
 
 from src.manager import todo_manager, DEFAULT_TDL_FILE
 from src.infrastructure.repository import XmlTodoRepository
-from src.models import *
 from src.logger import logger
 
 def _hex_to_bgr(hex_str: str) -> int:
