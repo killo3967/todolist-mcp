@@ -1,6 +1,6 @@
 # Feature: MCP Native Migration (pi-mcp-adapter -> Pi core)
 
-**Status**: Done (pending restart verification)
+**Status**: Done
 **Goal**: Move all MCP servers from the `pi-mcp-adapter` extension to Pi-native MCP support (Pi 0.99.x), so Pi can manage the servers itself and Codemode applies.
 
 ## Problem Statement
@@ -13,7 +13,7 @@ Pi 0.99.0 moved MCP into the core (Codemode + lazy tool loading + native lifecyc
 - [x] Write the native `mcp.json` with all 6 servers.
 - [x] Neutralize the adapter config to avoid double-loading.
 - [x] Verify end-to-end with `pi mcp list`.
-- [ ] Restart Pi (full process) and re-verify the loaded servers.
+- [x] Restart Pi (full process) and re-verify the loaded servers.
 
 ## Servers Migrated
 | Server | Transport | Exposure | Tools |
