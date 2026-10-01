@@ -41,8 +41,11 @@ Load this skill before ANY call to the `todolist` MCP server. The server manages
 
 ## Execution Steps
 
+## Execution Steps
+
 ### Configuration
 
+#### Standard Configuration (via `mcp_server.ini`)
 The server resolves the `.tdl` file path with priority:
 1. `$TODOLIST_FILE` environment variable (set by MCP client config)
 2. `mcp_server.ini` next to the server script (if `active = yes`)
@@ -54,6 +57,25 @@ For local dev, create `mcp_server.ini`:
 active = yes
 tdl_file = test-contract/test_contract.tdl
 ```
+
+#### Native Pi MCP Configuration
+To register the server natively in Pi, add it to your `~/.pi/agent/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "todolist": {
+      "command": "python",
+      "args": ["path/to/todolist-mcp/main.py"],
+      "env": {
+        "TODOLIST_FILE": "path/to/your-file.tdl"
+      },
+      "exposure": "codemode"
+    }
+  }
+}
+```
+
 
 ### Tool Reference
 

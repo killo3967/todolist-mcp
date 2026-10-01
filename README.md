@@ -34,7 +34,9 @@ The server resolves the `.tdl` file with this priority:
 2. `mcp_server.ini` — local file with `active = yes/no` toggle
 3. `~/todolist.tdl` — default fallback
 
-### MCP client
+### MCP client (Native Pi)
+
+To use this server with Pi's native MCP support, add it to your `~/.pi/agent/mcp.json` file:
 
 ```json
 {
@@ -44,7 +46,8 @@ The server resolves the `.tdl` file with this priority:
       "args": ["path/to/todolist-mcp/main.py"],
       "env": {
         "TODOLIST_FILE": "path/to/your-file.tdl"
-      }
+      },
+      "exposure": "codemode"
     }
   }
 }
@@ -65,6 +68,7 @@ tdl_file = test-contract/test_contract.tdl
 |----------|------|----------|
 | [Tutorial](docs/diataxis/tutorial.md) | Tutorial | From zero to first command in 5 steps |
 | [How-to Guide](docs/diataxis/how-to.md) | How-to | Recipes: create, search, comment, backup... |
+| [How-to: Native MCP](docs/diataxis/how-to-configure-native-pi-mcp.md) | How-to | Configure for Pi Native MCP |
 | [Explanation](docs/diataxis/explanation.md) | Explanation | Architecture, design decisions, .tdl format |
 | [API Reference](docs/diataxis/reference.md) | Reference | Complete 16-tool API with all parameters |
 
