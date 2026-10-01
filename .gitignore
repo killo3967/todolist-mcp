@@ -34,6 +34,9 @@ venv.bak/
 *.log
 # Local Pi runtime state
 .atl/
+.pi/
+# CodeGraph local index
+.codegraph/
 
 # Local development config
 mcp_server.ini
