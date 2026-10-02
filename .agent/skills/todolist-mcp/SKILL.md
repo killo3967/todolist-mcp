@@ -1,162 +1,146 @@
 ---
 name: todolist-mcp
-description: "Trigger: MCP todolist, tdl, tasks, ToDoList, add_task, update_task, complete_task, search_tasks, get_my_tasks, get_task_stats, todolist tool. MCP server for ToDoList (.tdl) files. Load before calling any todolist_* tool."
+description: "Trigger: MCP todolist, tdl, ToDoList, tasks, add_task, update_task, complete_task, search_tasks, get_task_stats, todolist tool. MCP server for ToDoList (.tdl) files. Load before calling any todolist_* tool — flat argument shape, exact parameter formats."
 license: Apache-2.0
 metadata:
   author: gentleman-programming
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## Activation Contract
 
-Load this skill before ANY call to the `todolist` MCP server. The server manages ToDoList (.tdl) XML files via 13 tools over stdio JSON-RPC. All mutations persist to the `.tdl` file immediately. Do not assume ToDoList Desktop is running — changes are direct to the XML file.
+Load this skill before ANY call to the `todolist` MCP server (`todolist_*` or `mcp__todolist__*`). The server manages ToDoList `.tdl` XML files over stdio JSON-RPC and exposes 17 tools. Every mutation is written to the `.tdl` file immediately; ToDoList Desktop does not need to be running.
+
+## Which server are you calling?
+
+The flat-vs-nested argument shape depends on which entry point is running. Check the server's `args` path in the MCP client config:
+
+| Entry point | Tools | Argument shape |
+|---|---|---|
+| `main.py` → `src/tools.py` | 17 | **Flat** — parameters directly |
+| `tdl_mcp_server.py` (repo root) | 13 | **Nested** — parameters inside `args` |
+
+This skill documents `main.py`. If your config points at the root `tdl_mcp_server.py`, every call needs an extra `args` wrapper. Rule 1 applies to `main.py` only.
 
 ## Hard Rules
 
-1. **Always wrap args**: every tool call must pass `{"args": {"param": "value", ...}}`, never flat arguments.
-2. **`task_id` is always a string**, never an integer (e.g. `"42"`, not `42`).
-3. **`position` is always the PARENT path**, not an insert-before target. `"5"` appends as child of task 5.
-4. **`add_comment` never replaces** — it always appends to the existing description.
-5. **Date format**: always `YYYY-MM-DD` for `due_date` and `start_date`.
-6. **Priority values**: `Low`, `Below Normal`, `Normal`, `Above Normal`, `High`, `Urgent`.
-7. **Clear a field**: pass an empty string `""` for `due_date`, `category`, `allocated_to`, `color`, `start_date`, `tags`. Pass `"0"` for `priority` (Normal).
+1. **Flat arguments.** Pass parameters directly, one level deep: `mcp({tool: "todolist_get_task", args: {task_id: "42"}})`. Do not nest a second `args` object — the tool receives it as an unexpected parameter and validation fails.
+2. **`task_id` accepts a string or an integer.** Use `"42"` for consistency with the `.tdl` XML, where IDs are strings.
+3. **`position` and `new_position` are PARENT paths**, not insert-before targets. `"5"` appends as a child of task at position 5; `"2.3"` targets the third child of task 2.
+4. **Dates are `YYYY-MM-DD`** — for `due_date`, `start_date` and `target_date`. An invalid format is silently dropped, not rejected. ToDoList *displays* `DD/MM/YYYY`, but the API never accepts that form.
+5. **`priority` is a closed set:** `Low`, `Below Normal`, `Normal`, `Above Normal`, `High`, `Urgent`.
+6. **`percent_done` is an int 0–100**; `time_estimate` is a float in days (`0.125` = 3h, `0.25` = 6h, `1.0` = 1 day).
+7. **`add_comment` always appends.** `update_task` with `description` **replaces** the entire body — use `add_comment` for logs.
 
 ## Decision Gates
 
 | Situation | Action |
 |-----------|--------|
-| Need all tasks | `get_my_tasks` (markdown default, or `json`) |
-| Need tasks due today | `get_today_tasks` |
-| Create a new task | `add_task` (title required, rest optional) |
-| Modify existing task | `update_task` (task_id required) |
-| Mark task done | `complete_task` (sets progress=100, status) |
-| Add text to task | `add_comment` (appends, never replaces) |
-| Find tasks | `search_tasks` (term, category, priority, status, completed, assigned_to) |
-| Rearrange hierarchy | `move_task` |
-| Inspect one task | `get_task` |
-| File health check | `get_file_status` |
-| Read any .tdl file | `read_any_tdl_file` |
-| Inspect XML structure | `analyze_structure` |
+| Need all tasks | `get_my_tasks` |
+| Need tasks due on a date | `get_today_tasks` (`target_date`) |
+| Read one task + children | `get_task` (`task_id`) |
+| Find tasks by text or filter | `search_tasks` |
+| Create a task | `add_task` (`title` required) |
+| Modify a task | `update_task` (`task_id` required) |
+| Mark a task done | `complete_task` (`task_id`, optional `status_text`) |
+| Append a log entry | `add_comment` (`task_id`, `comment`) |
+| Delete a task | `delete_task` (`task_id`) |
+| Rearrange hierarchy | `move_task` (`task_id`, `new_position`) |
 | Counts by status/priority | `get_task_stats` |
+| Check the .tdl file | `get_file_status` |
+| Read another .tdl | `read_any_tdl_file` (`file_path`) |
+| Inspect XML structure | `analyze_structure` |
+| Back up / restore | `backup_tdl` / `restore_tdl` |
+| Diagnose the server | `get_server_logs` (`lines`, default 100) |
+| Tool rejects an unknown parameter | Check for a nested `args` wrapper (Rule 1) |
+| A date is ignored with no error | Use `YYYY-MM-DD` (Rule 4) |
 
 ## Execution Steps
 
-## Execution Steps
+### Tool signatures
 
-### Configuration
+`*` marks a required parameter. Every `format` parameter accepts `markdown` or `json` and defaults to `json` — set it explicitly when you need to parse the output.
 
-#### Standard Configuration (via `mcp_server.ini`)
-The server resolves the `.tdl` file path with priority:
-1. `$TODOLIST_FILE` environment variable (set by MCP client config)
-2. `mcp_server.ini` next to the server script (if `active = yes`)
-3. Hardcoded fallback
+| Tool | Parameters |
+|---|---|
+| `get_my_tasks` | `format` |
+| `get_today_tasks` | `target_date`, `format` |
+| `get_task` | `task_id*`, `format` |
+| `search_tasks` | `search_term`, `category`, `priority`, `completed`, `status`, `allocated_to`, `format` |
+| `get_task_stats` | `format` |
+| `get_file_status` | — |
+| `analyze_structure` | — |
+| `read_any_tdl_file` | `file_path*`, `format` |
+| `add_task` | `title*`, `position`, `description`, `due_date`, `start_date`, `priority`, `category`, `status`, `time_estimate`, `color`, `tags`, `icon` |
+| `update_task` | `task_id*`, plus every `add_task` field and `percent_done`, `allocated_to` |
+| `complete_task` | `task_id*`, `status_text` (default `Completed`) |
+| `add_comment` | `task_id*`, `comment*` |
+| `delete_task` | `task_id*` |
+| `move_task` | `task_id*`, `new_position*` |
+| `backup_tdl` / `restore_tdl` | — |
+| `get_server_logs` | `lines` |
 
-For local dev, create `mcp_server.ini`:
-```ini
-[server]
-active = yes
-tdl_file = test-contract/test_contract.tdl
+### Call format
+
+```js
+mcp({tool: "todolist_get_task", args: {task_id: "42"}})
+mcp({tool: "todolist_add_task", args: {title: "Fix cover", priority: "High", due_date: "2026-08-15"}})
 ```
 
-#### Native Pi MCP Configuration
-To register the server natively in Pi, add it to your `~/.pi/agent/mcp.json`:
+The wire-level JSON-RPC request still carries `params.arguments`, but your client builds that from `args`. One level only.
+
+### Creating a task
 
 ```json
-{
-  "mcpServers": {
-    "todolist": {
-      "command": "python",
-      "args": ["path/to/todolist-mcp/main.py"],
-      "env": {
-        "TODOLIST_FILE": "path/to/your-file.tdl"
-      },
-      "exposure": "codemode"
-    }
-  }
-}
+{"title": "Task title (required)",
+ "position": "2.3",
+ "description": "Long description",
+ "due_date": "2026-08-15",
+ "start_date": "2026-08-01",
+ "priority": "High",
+ "category": "work",
+ "status": "In Progress",
+ "time_estimate": 0.125,
+ "color": "#FF6B35",
+ "tags": "invoice",
+ "icon": 1}
 ```
 
+- `color` is hex RGB; the server converts it to ToDoList's BGR integer.
+- `status` is free text and is stored verbatim.
+- Clear a field by passing `""` (`due_date`, `category`, `allocated_to`, `color`, `tags`).
 
-### Tool Reference
+### Updating a task
 
-#### Read tools
-
-**get_my_tasks** — all tasks, hierarchical
-- `format`: `"markdown"` (default) | `"json"`
-
-**get_today_tasks** — tasks due on a date
-- `target_date`: `"YYYY-MM-DD"` (optional, defaults to today)
-- `format`: `"markdown"` (default) | `"json"`
-
-**get_task** — one task + its children
-- `task_id` *required*: task ID string
-- `format`: `"markdown"` (default) | `"json"`
-
-**search_tasks** — filter tasks
-- `search_term`: free text (matches title + description)
-- `category`: filter by category name
-- `priority`: `Low` | `Below Normal` | `Normal` | `Above Normal` | `High` | `Urgent`
-- `status`: filter by status text (e.g. `"Pendiente"`, `"En curso"`)
-- `completed`: `true` | `false`
-- `assigned_to`: filter by person name
-- `format`: `"markdown"` (default) | `"json"`
-
-**get_file_status** — file statistics (no parameters)
-
-**read_any_tdl_file** — read any .tdl file
-- `file_path` *required*: absolute path to .tdl file
-- `format`: `"markdown"` (default) | `"json"`
-
-**analyze_structure** — XML structure diagnostic (no parameters)
-
-**get_task_stats** — counts by status, priority, category
-- `format`: `"markdown"` (default) | `"json"`
-
-#### Write tools
-
-**add_task** — create a task
-- `title` *required*: task title string
-- `position`: parent path (e.g. `"3"` = child of task at position 3)
-- `description`: task description text
-- `due_date`: `"YYYY-MM-DD"`
-- `priority`: one of the 6 priority values (default: `Normal`)
-- `category`: category/project name
-- `status`: status text (e.g. `"Pendiente"`, `"En curso"`)
-- `time_estimate`: days as float (e.g. `0.125` = 3 hours)
-- `color`: hex RGB string (e.g. `"#FF6B35"`)
-
-**update_task** — modify any field
-- `task_id` *required*: task ID to update
-- All optional fields from `add_task` plus:
-- `percent_done`: 0–100 integer
-- `allocated_to`: person name(s), comma-separated
-- `tags`: comma-separated tags (e.g. `"bug, urgent"`)
-
-**complete_task** — mark task done
-- `task_id` *required*: task ID
-- `status_text`: status to set (default: `"Completed"`)
-
-**add_comment** — append text to description
-- `task_id` *required*: task ID
-- `comment` *required*: text to append
-
-**move_task** — reposition in hierarchy
-- `task_id` *required*: task ID to move
-- `new_position` *required*: target position (e.g. `"2.1"` = child of pos 2, index 1)
-
-### MCP Call Format
-
-All tools use this JSON-RPC shape:
 ```json
-{"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "tool_name", "arguments": {"args": {"param": "value"}}}}
+{"task_id": "42",
+ "percent_done": 50,
+ "status": "In Progress",
+ "due_date": "2026-08-15"}
+```
+
+Only the fields you send change. `description` is the exception: it replaces the whole body.
+
+### Appending a comment
+
+```json
+{"task_id": "42", "comment": "### 2026-10-02 | 11:30 | Note | what happened"}
 ```
 
 ## Output Contract
 
-All tools return a string in the `content[0].text` field of the response. For `json` format tools, parse the text with `JSON.parse()` or `json.loads()`. Write tools return a success/error message string. Read errors return the error text directly.
+All tools return a plain string in `content[0].text`. For `format: "json"` the text is a JSON document to parse; otherwise it is hierarchical markdown. Write tools return a success or `Error` message string. Failures arrive as text with an `Error` prefix rather than as a JSON-RPC error, so always inspect the payload before assuming success. `get_task` on a missing id returns `Error: Task with ID 'X' not found.`
+
+## Install
+
+Copy this folder into a skills directory so the agent loads it automatically:
+
+- Global: `~/.agents/skills/todolist-mcp/`
+- Per project: `<project>/.agent/skills/todolist-mcp/`
 
 ## References
 
-- `references/tool-schemas.json` — full JSON schemas for all 13 tools (generated from server)
-- Server source: `K:/todolist_mcp/tdl_mcp_server.py`
-- Test data: `K:/todolist_mcp/test-contract/test_contract.tdl`
+- `references/tool-schemas.json` — full JSON input schemas for all 17 tools, captured from the running server.
+- `src/tools.py` — authoritative tool signatures; check here when a parameter is unclear.
+- `../../../docs/diataxis/reference.md` — human-facing tool reference and JSON-RPC call format.
+- `../../../docs/diataxis/how-to-configure-native-pi-mcp.md` — register the server with Pi.

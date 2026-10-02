@@ -1,137 +1,247 @@
 {
   "get_my_tasks": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/GetTasksArgs"
+      "format": {
+        "default": "json",
+        "enum": [
+          "markdown",
+          "json"
+        ],
+        "title": "Format",
+        "type": "string"
       }
     },
-    "required": [
-      "args"
-    ],
     "type": "object",
-    "$defs": {
-      "GetTasksArgs": {
-        "properties": {
-          "format": {
-            "default": "markdown",
-            "description": "Output format",
-            "enum": [
-              "markdown",
-              "json"
-            ],
-            "title": "Format",
-            "type": "string"
-          }
-        },
-        "title": "GetTasksArgs",
-        "type": "object"
-      }
-    },
-    "title": "get_my_tasksArguments"
+    "title": "get_my_tasksArguments",
+    "description": "Get all tasks from your main ToDoList file"
   },
   "get_today_tasks": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/GetTodayTasksArgs"
-      }
-    },
-    "required": [
-      "args"
-    ],
-    "type": "object",
-    "$defs": {
-      "GetTodayTasksArgs": {
-        "properties": {
-          "target_date": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Target date in YYYY-MM-DD format (defaults to today)",
-            "title": "Target Date"
-          },
-          "format": {
-            "default": "markdown",
-            "description": "Output format",
-            "enum": [
-              "markdown",
-              "json"
-            ],
-            "title": "Format",
+      "target_date": {
+        "anyOf": [
+          {
             "type": "string"
+          },
+          {
+            "type": "null"
           }
-        },
-        "title": "GetTodayTasksArgs",
-        "type": "object"
+        ],
+        "default": null,
+        "title": "Target Date"
+      },
+      "format": {
+        "default": "json",
+        "enum": [
+          "markdown",
+          "json"
+        ],
+        "title": "Format",
+        "type": "string"
       }
     },
-    "title": "get_today_tasksArguments"
+    "type": "object",
+    "title": "get_today_tasksArguments",
+    "description": "Get today's tasks from your main ToDoList file"
   },
   "add_task": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/AddTaskArgs"
+      "title": {
+        "title": "Title",
+        "type": "string"
+      },
+      "position": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Position"
+      },
+      "description": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Description"
+      },
+      "due_date": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Due Date"
+      },
+      "priority": {
+        "default": "Normal",
+        "enum": [
+          "Low",
+          "Below Normal",
+          "Normal",
+          "Above Normal",
+          "High",
+          "Urgent"
+        ],
+        "title": "Priority",
+        "type": "string"
+      },
+      "category": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Category"
+      },
+      "status": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Status"
+      },
+      "time_estimate": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Time Estimate"
+      },
+      "color": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Color"
+      },
+      "start_date": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Start Date"
+      },
+      "tags": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Tags"
+      },
+      "icon": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Icon"
       }
     },
     "required": [
-      "args"
+      "title"
     ],
     "type": "object",
-    "$defs": {
-      "AddTaskArgs": {
-        "properties": {
-          "title": {
-            "description": "Task title",
-            "title": "Title",
+    "title": "add_taskArguments",
+    "description": "Add a new task to your main ToDoList file"
+  },
+  "update_task": {
+    "properties": {
+      "task_id": {
+        "anyOf": [
+          {
             "type": "string"
           },
-          "position": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Position to add the task (e.g., '6.3.4' or parent position '5.3.7')",
-            "title": "Position"
+          {
+            "type": "integer"
+          }
+        ],
+        "title": "Task Id"
+      },
+      "title": {
+        "anyOf": [
+          {
+            "type": "string"
           },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Task description",
-            "title": "Description"
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Title"
+      },
+      "description": {
+        "anyOf": [
+          {
+            "type": "string"
           },
-          "due_date": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Due date in YYYY-MM-DD format",
-            "title": "Due Date"
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Description"
+      },
+      "due_date": {
+        "anyOf": [
+          {
+            "type": "string"
           },
-          "priority": {
-            "default": "Normal",
-            "description": "Task priority",
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Due Date"
+      },
+      "priority": {
+        "anyOf": [
+          {
             "enum": [
               "Low",
               "Below Normal",
@@ -140,597 +250,429 @@
               "High",
               "Urgent"
             ],
-            "title": "Priority",
             "type": "string"
           },
-          "category": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Task category or project",
-            "title": "Category"
-          },
-          "status": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Task status text (e.g. 'Pendiente', 'In Progress', 'Completed')",
-            "title": "Status"
-          },
-          "time_estimate": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Time estimate in days (e.g. 0.125 for 3 hours)",
-            "title": "Time Estimate"
-          },
-          "color": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Task color as hex RGB (e.g. '#FF6B35')",
-            "title": "Color"
-          },
-          "start_date": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Start date in YYYY-MM-DD format",
-            "title": "Start Date"
-          },
-          "tags": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Comma-separated tags (e.g. 'bug, urgent, frontend')",
-            "title": "Tags"
+          {
+            "type": "null"
           }
-        },
-        "required": [
-          "title"
         ],
-        "title": "AddTaskArgs",
-        "type": "object"
-      }
-    },
-    "title": "add_taskArguments"
-  },
-  "update_task": {
-    "properties": {
-      "args": {
-        "$ref": "#/$defs/UpdateTaskArgs"
+        "default": null,
+        "title": "Priority"
+      },
+      "category": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Category"
+      },
+      "percent_done": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Percent Done"
+      },
+      "allocated_to": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Allocated To"
+      },
+      "status": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Status"
+      },
+      "time_estimate": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Time Estimate"
+      },
+      "color": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Color"
+      },
+      "start_date": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Start Date"
+      },
+      "tags": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Tags"
+      },
+      "icon": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Icon"
       }
     },
     "required": [
-      "args"
+      "task_id"
     ],
     "type": "object",
-    "$defs": {
-      "UpdateTaskArgs": {
-        "properties": {
-          "task_id": {
-            "description": "ID of the task to update",
-            "title": "Task Id",
-            "type": "string"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "New task title",
-            "title": "Title"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "New task description",
-            "title": "Description"
-          },
-          "due_date": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "New due date in YYYY-MM-DD format (empty string to clear)",
-            "title": "Due Date"
-          },
-          "priority": {
-            "anyOf": [
-              {
-                "enum": [
-                  "Low",
-                  "Below Normal",
-                  "Normal",
-                  "Above Normal",
-                  "High",
-                  "Urgent"
-                ],
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "New task priority",
-            "title": "Priority"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "New task category or project (empty string to clear)",
-            "title": "Category"
-          },
-          "percent_done": {
-            "anyOf": [
-              {
-                "maximum": 100,
-                "minimum": 0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Completion percentage (0-100)",
-            "title": "Percent Done"
-          },
-          "allocated_to": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Person(s) assigned to task (empty string to clear)",
-            "title": "Allocated To"
-          },
-          "status": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Task status text (e.g. 'Pendiente', 'In Progress', 'Completed')",
-            "title": "Status"
-          },
-          "time_estimate": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Time estimate in days (e.g. 0.125 for 3 hours)",
-            "title": "Time Estimate"
-          },
-          "color": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Task color as hex RGB (e.g. '#FF6B35'). Empty string to clear.",
-            "title": "Color"
-          }
-        },
-        "required": [
-          "task_id"
-        ],
-        "title": "UpdateTaskArgs",
-        "type": "object"
-      }
-    },
-    "title": "update_taskArguments"
+    "title": "update_taskArguments",
+    "description": "Update an existing task in your main ToDoList file"
   },
   "add_comment": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/AddCommentArgs"
+      "task_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          }
+        ],
+        "title": "Task Id"
+      },
+      "comment": {
+        "title": "Comment",
+        "type": "string"
       }
     },
     "required": [
-      "args"
+      "task_id",
+      "comment"
     ],
     "type": "object",
-    "$defs": {
-      "AddCommentArgs": {
-        "properties": {
-          "task_id": {
-            "description": "ID of the task to add a comment to",
-            "title": "Task Id",
-            "type": "string"
-          },
-          "comment": {
-            "description": "Comment text to append to the task description",
-            "title": "Comment",
-            "type": "string"
-          }
-        },
-        "required": [
-          "task_id",
-          "comment"
-        ],
-        "title": "AddCommentArgs",
-        "type": "object"
-      }
-    },
-    "title": "add_commentArguments"
+    "title": "add_commentArguments",
+    "description": "Append a comment to a task description."
   },
   "search_tasks": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/SearchTasksArgs"
-      }
-    },
-    "required": [
-      "args"
-    ],
-    "type": "object",
-    "$defs": {
-      "SearchTasksArgs": {
-        "properties": {
-          "search_term": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Search in task titles and descriptions",
-            "title": "Search Term"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Filter by category",
-            "title": "Category"
-          },
-          "priority": {
-            "anyOf": [
-              {
-                "enum": [
-                  "Low",
-                  "Below Normal",
-                  "Normal",
-                  "Above Normal",
-                  "High",
-                  "Urgent"
-                ],
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Filter by priority",
-            "title": "Priority"
-          },
-          "status": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Filter by status text (e.g. 'Pendiente', 'En curso', 'Terminado')",
-            "title": "Status"
-          },
-          "completed": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Filter by completion status",
-            "title": "Completed"
-          },
-          "assigned_to": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Filter by person assigned",
-            "title": "Assigned To"
-          },
-          "format": {
-            "default": "markdown",
-            "description": "Output format",
-            "enum": [
-              "markdown",
-              "json"
-            ],
-            "title": "Format",
+      "search_term": {
+        "anyOf": [
+          {
             "type": "string"
+          },
+          {
+            "type": "null"
           }
-        },
-        "title": "SearchTasksArgs",
-        "type": "object"
+        ],
+        "default": null,
+        "title": "Search Term"
+      },
+      "category": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Category"
+      },
+      "priority": {
+        "anyOf": [
+          {
+            "enum": [
+              "Low",
+              "Below Normal",
+              "Normal",
+              "Above Normal",
+              "High",
+              "Urgent"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Priority"
+      },
+      "completed": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Completed"
+      },
+      "status": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Status"
+      },
+      "allocated_to": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Allocated To"
+      },
+      "format": {
+        "default": "json",
+        "enum": [
+          "markdown",
+          "json"
+        ],
+        "title": "Format",
+        "type": "string"
       }
     },
-    "title": "search_tasksArguments"
+    "type": "object",
+    "title": "search_tasksArguments",
+    "description": "Search and filter tasks in your main ToDoList file"
   },
   "move_task": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/MoveTaskArgs"
+      "task_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          }
+        ],
+        "title": "Task Id"
+      },
+      "new_position": {
+        "title": "New Position",
+        "type": "string"
       }
     },
     "required": [
-      "args"
+      "task_id",
+      "new_position"
     ],
     "type": "object",
-    "$defs": {
-      "MoveTaskArgs": {
-        "properties": {
-          "task_id": {
-            "description": "ID of the task to move",
-            "title": "Task Id",
-            "type": "string"
-          },
-          "new_position": {
-            "description": "New position for the task (e.g., '6.3.4' or parent position '5.3.7')",
-            "title": "New Position",
-            "type": "string"
-          }
-        },
-        "required": [
-          "task_id",
-          "new_position"
-        ],
-        "title": "MoveTaskArgs",
-        "type": "object"
-      }
-    },
-    "title": "move_taskArguments"
+    "title": "move_taskArguments",
+    "description": "Move a task to a new position in the hierarchy."
   },
   "get_task": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/GetTaskArgs"
+      "task_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          }
+        ],
+        "title": "Task Id"
+      },
+      "format": {
+        "default": "json",
+        "enum": [
+          "markdown",
+          "json"
+        ],
+        "title": "Format",
+        "type": "string"
       }
     },
     "required": [
-      "args"
+      "task_id"
     ],
     "type": "object",
-    "$defs": {
-      "GetTaskArgs": {
-        "properties": {
-          "task_id": {
-            "description": "ID of the task to retrieve",
-            "title": "Task Id",
-            "type": "string"
-          },
-          "format": {
-            "default": "markdown",
-            "description": "Output format",
-            "enum": [
-              "markdown",
-              "json"
-            ],
-            "title": "Format",
-            "type": "string"
-          }
-        },
-        "required": [
-          "task_id"
-        ],
-        "title": "GetTaskArgs",
-        "type": "object"
-      }
-    },
-    "title": "get_taskArguments"
+    "title": "get_taskArguments",
+    "description": "Get a specific task and its children from your main ToDoList file"
   },
   "get_file_status": {
     "properties": {},
     "type": "object",
-    "title": "get_file_statusArguments"
+    "title": "get_file_statusArguments",
+    "description": "Check the status of your main ToDoList file"
   },
   "read_any_tdl_file": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/ReadAnyTdlArgs"
+      "file_path": {
+        "title": "File Path",
+        "type": "string"
+      },
+      "format": {
+        "default": "json",
+        "enum": [
+          "markdown",
+          "json"
+        ],
+        "title": "Format",
+        "type": "string"
       }
     },
     "required": [
-      "args"
+      "file_path"
     ],
     "type": "object",
-    "$defs": {
-      "ReadAnyTdlArgs": {
-        "properties": {
-          "file_path": {
-            "description": "Path to the .tdl file",
-            "title": "File Path",
-            "type": "string"
-          },
-          "format": {
-            "default": "markdown",
-            "description": "Output format",
-            "enum": [
-              "markdown",
-              "json"
-            ],
-            "title": "Format",
-            "type": "string"
-          }
-        },
-        "required": [
-          "file_path"
-        ],
-        "title": "ReadAnyTdlArgs",
-        "type": "object"
-      }
-    },
-    "title": "read_any_tdl_fileArguments"
+    "title": "read_any_tdl_fileArguments",
+    "description": "Read tasks from any ToDoList .tdl file"
   },
   "analyze_structure": {
     "properties": {},
     "type": "object",
-    "title": "analyze_structureArguments"
+    "title": "analyze_structureArguments",
+    "description": "Analyze the XML structure of your main ToDoList file"
   },
   "complete_task": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/CompleteTaskArgs"
+      "task_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          }
+        ],
+        "title": "Task Id"
+      },
+      "status_text": {
+        "default": "Completed",
+        "title": "Status Text",
+        "type": "string"
       }
     },
     "required": [
-      "args"
+      "task_id"
     ],
     "type": "object",
-    "$defs": {
-      "CompleteTaskArgs": {
-        "properties": {
-          "task_id": {
-            "description": "ID of the task to complete",
-            "title": "Task Id",
+    "title": "complete_taskArguments",
+    "description": "Complete a task."
+  },
+  "delete_task": {
+    "properties": {
+      "task_id": {
+        "anyOf": [
+          {
             "type": "string"
           },
-          "status_text": {
-            "default": "Completed",
-            "description": "Status text to set (e.g. 'Terminado', 'Completed')",
-            "title": "Status Text",
-            "type": "string"
+          {
+            "type": "integer"
           }
-        },
-        "required": [
-          "task_id"
         ],
-        "title": "CompleteTaskArgs",
-        "type": "object"
+        "title": "Task Id"
       }
     },
-    "title": "complete_taskArguments"
+    "required": [
+      "task_id"
+    ],
+    "type": "object",
+    "title": "delete_taskArguments",
+    "description": "Delete a task."
   },
   "get_task_stats": {
     "properties": {
-      "args": {
-        "$ref": "#/$defs/GetTaskStatsArgs"
+      "format": {
+        "default": "json",
+        "enum": [
+          "markdown",
+          "json"
+        ],
+        "title": "Format",
+        "type": "string"
       }
     },
-    "required": [
-      "args"
-    ],
     "type": "object",
-    "$defs": {
-      "GetTaskStatsArgs": {
-        "properties": {
-          "format": {
-            "default": "markdown",
-            "description": "Output format",
-            "enum": [
-              "markdown",
-              "json"
-            ],
-            "title": "Format",
-            "type": "string"
-          }
-        },
-        "title": "GetTaskStatsArgs",
-        "type": "object"
+    "title": "get_task_statsArguments",
+    "description": "Get task statistics."
+  },
+  "backup_tdl": {
+    "properties": {},
+    "type": "object",
+    "title": "backup_tdlArguments",
+    "description": "Backup the ToDoList file."
+  },
+  "restore_tdl": {
+    "properties": {},
+    "type": "object",
+    "title": "restore_tdlArguments",
+    "description": "Restore the ToDoList file from backup."
+  },
+  "get_server_logs": {
+    "properties": {
+      "lines": {
+        "default": 100,
+        "title": "Lines",
+        "type": "integer"
       }
     },
-    "title": "get_task_statsArguments"
+    "type": "object",
+    "title": "get_server_logsArguments",
+    "description": "Retrieve the recent server logs to diagnose issues"
   }
 }
