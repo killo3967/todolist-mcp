@@ -4,7 +4,7 @@ description: "Trigger: MCP todolist, tdl, ToDoList, tasks, add_task, update_task
 license: Apache-2.0
 metadata:
   author: gentleman-programming
-  version: "2.0"
+  version: "2.1"
 ---
 
 ## Activation Contract
@@ -13,14 +13,22 @@ Load this skill before ANY call to the `todolist` MCP server (`todolist_*` or `m
 
 ## Which server are you calling?
 
-The flat-vs-nested argument shape depends on which entry point is running. Check the server's `args` path in the MCP client config:
+Both entry points in this repository run the same server, so the argument shape is flat either way:
 
-| Entry point | Tools | Argument shape |
-|---|---|---|
-| `main.py` → `src/tools.py` | 17 | **Flat** — parameters directly |
-| `tdl_mcp_server.py` (repo root) | 13 | **Nested** — parameters inside `args` |
+| Entry point | What it is |
+|---|---|
+| `main.py` | Canonical entry point — `src/tools.py`, 17 tools |
+| `tdl_mcp_server.py` (repo root) | 9-line compatibility shim that imports the same `src.tools.mcp` |
 
-This skill documents `main.py`. If your config points at the root `tdl_mcp_server.py`, every call needs an extra `args` wrapper. Rule 1 applies to `main.py` only.
+The nested `{"args": {...}}` shape belongs to the **old upstream monolith**, which this fork no longer ships. You meet it only when an MCP client points at a stale copy of that file kept outside the repository, such as a local `.local/todolist-mcp/tdl_mcp_server_patched.py`.
+
+If a call fails with an unknown-parameter error or `Field required: args`, check the path your client actually runs:
+
+```bash
+grep "from src.tools import mcp" <configured-file>
+```
+
+A match means the flat contract in this skill applies. No match means you are running the legacy monolith, which needs the extra `args` wrapper.
 
 ## Hard Rules
 
