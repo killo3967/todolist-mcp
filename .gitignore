@@ -43,3 +43,6 @@ mcp_server.ini
 config.json
 openspec/
 
+# Local work tracking (ODD tasks)
+odd/
+
